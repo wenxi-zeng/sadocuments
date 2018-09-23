@@ -232,20 +232,7 @@ The KWIC index system only has two possible scenarios due to its nature: manual 
 
 This use case is designed for internal test. Thus, the actor would only allow to be tester. The tester should be able to input a sentence and relieved a list of indices as result. 
 
-```plantuml
-@startuml
-left to right direction
-skinparam packageStyle rectangle
-actor Tester
-rectangle "Manual data input" {
-  Tester -- (Input sentence)
-  (Input sentence) .> (Store line)
-  (Store line) .> (Circular shift)
-  (Circular shift) -> (Alphabetize)
-  (Alphabetize) -> (Output)
-}
-@enduml
-```
+![srs](out/srs/srs.png)
 
 |                      |                                                                                                                                                                                                                                     |
 |:---------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -261,29 +248,8 @@ rectangle "Manual data input" {
 
 This use case is designed for production. After integration with web crawler system and backend API, this system should be able to operate automatically. It reads the collected from crawler system periodically and outputs the indices to database by using backend API. 
 
-```plantuml
-@startuml
-left to right direction
-skinparam packageStyle rectangle
-actor Admin
-actor Backend
-rectangle "Auto file import" {
-  Admin -- (start system)
-  (start system) -> (import file)
-  (import file) .> (Store line)
-  (Store line) .> (Circular shift)
-  (Circular shift) -> (Alphabetize)
-  (Alphabetize) -> (Output)
-  (Output) -- Backend
-  note right of (Output)
-    After output the data,
-    the system rest for a certain
-    amout of time, and import file
-    again
-  end note
-}
-@enduml
-```
+![srs-1](out/srs/srs-1.png)
+
 |   |   |
 |---|---|
 |Use Case name   |Auto file import   |
@@ -296,110 +262,17 @@ rectangle "Auto file import" {
 
 #### 3.4.3 Object model
 
-```plantuml
-@startuml
-MasterControl ..> LineStorage
-MasterControl ..> CircularShift
-MasterControl ..> AlphabeticShift
-
-class LineStorage {
-  ....
-  + setup() : void
-  + getSentences() : List<String>
-  + setSentences() : void
-  ____
-  - sentences : List<String> 
-}
-
-class CircularShift {
-  ....
-  + setup() : void
-  + getSentences() : List<String>
-  + setSentences() : void
-  ____
-  - sentences : List<String> 
-}
-
-class AlphabeticShift {
-  ....
-  + setup() : void
-  + getSentences() : List<String>
-  + setSentences() : void
-  ____
-  - sentences : List<String> 
-}
-
-class MasterControl {
-  ....
-  ____
-}
-
-@enduml
-```
+![srs-2](out/srs/srs-2.png)
 
 #### 3.4.4 Dynamic model
 
 ##### 3.4.4.1 Manual data input
 
-```plantuml
-@startuml
-participant Tester
-
-User -> LineStorage: setSentences
-activate LineStorage
-
-LineStorage -> CircularShift: setSentences
-activate CircularShift
-
-CircularShift -> AlphabeticShift: setSentences
-activate AlphabeticShift
-AlphabeticShift --> CircularShift: WorkDone
-deactivate AlphabeticShift
-
-CircularShift --> LineStorage: WorkDone
-deactivate CircularShift
-
-LineStorage -> User: Done
-deactivate LineStorage
-
-@enduml
-```
+![srs-3](out/srs/srs-3.png)
 
 ##### 3.4.4.2 Auto file import
 
-```plantuml
-@startuml
-participant Admin
-participant Crawler
-
-Admin -> MasterControl: start
-activate MasterControl
-
-MasterControl -> Crawler: readFile
-activate LineStorage
-
-Crawler -> MasterControl: Done
-deactivate Crawler
-
-MasterControl -> LineStorage: setSentences
-activate LineStorage
-
-LineStorage -> CircularShift: setSentences
-activate CircularShift
-
-CircularShift -> AlphabeticShift: setSentences
-activate AlphabeticShift
-AlphabeticShift --> CircularShift: WorkDone
-deactivate AlphabeticShift
-
-CircularShift --> LineStorage: WorkDone
-deactivate CircularShift
-
-LineStorage -> MasterControl: Done
-deactivate LineStorage
-
-@enduml
-```
+![srs-4](out/srs/srs-4.png)
 
 #### 3.4.5 User interface—navigational paths and screen mock-ups
 
