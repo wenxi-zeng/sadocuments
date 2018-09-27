@@ -133,12 +133,12 @@ LineStorage -> CircularShift: execute
 activate CircularShift
 deactivate LineStorage
 
-CircularShift -> AlphabeticShift: execute
-activate AlphabeticShift
+CircularShift -> Alphabetizer: execute
+activate Alphabetizer
 deactivate CircularShift
 
-AlphabeticShift --> Presenter: callback
-deactivate AlphabeticShift
+Alphabetizer --> Presenter: callback
+deactivate Alphabetizer
 
 Presenter --> View: callback
 deactivate Presenter
@@ -152,33 +152,34 @@ deactivate View
 ```plantuml
 @startuml
 participant Admin
-participant Crawler
 
-Admin -> MasterControl: start
-activate MasterControl
+Admin -> View: start service
+activate View
 
-MasterControl -> Crawler: readFile
+View -> Presenter: import files
+activate Presenter
+deactivate View
+
+Presenter -> Presenter: import crawler\ncollected data
+
+Presenter -> Algorithm: process
+activate Algorithm
+
+Algorithm -> LineStorage: execute
 activate LineStorage
+deactivate Algorithm
 
-Crawler -> MasterControl: Done
-deactivate Crawler
-
-MasterControl -> LineStorage: setSentences
-activate LineStorage
-
-LineStorage -> CircularShift: setSentences
+LineStorage -> CircularShift: execute
 activate CircularShift
+deactivate LineStorage
 
-CircularShift -> AlphabeticShift: setSentences
-activate AlphabeticShift
-AlphabeticShift --> CircularShift: WorkDone
-deactivate AlphabeticShift
-
-CircularShift --> LineStorage: WorkDone
+CircularShift -> Alphabetizer: execute
+activate Alphabetizer
 deactivate CircularShift
 
-LineStorage -> MasterControl: Done
-deactivate LineStorage
+Alphabetizer --> Presenter: callback
+deactivate Alphabetizer
+deactivate Presenter
 
 @enduml
 ```
