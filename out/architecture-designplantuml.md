@@ -98,3 +98,29 @@ class Sentence {
 
 @enduml
 ```
+
+
+
+```plantuml
+@startuml
+cloud cloud
+component crawler
+component kwic
+component frontend
+component backend
+node node1
+node node2
+node node3
+node node4
+
+[kwic] --> [crawler]
+[kwic] --> [backend]
+[frontend] --> [backend]
+[backend] --> [cloud]
+[cloud] -- [node1]
+[cloud] -- [node2]
+[cloud] -- [node3]
+[cloud] -- [node4]
+@enduml
+```
+

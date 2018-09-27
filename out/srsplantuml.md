@@ -40,38 +40,70 @@ rectangle "Auto file import" {
 
 ```plantuml
 @startuml
-MasterControl ..> LineStorage
-MasterControl ..> CircularShift
-MasterControl ..> AlphabeticShift
+left to right direction
+LineStorage *.. Sentence
+CircularShifter *..> Sentence
+Alphabetizer *..> Sentence
+BaseProcessAlgorithm --> Sentence
+BaseProcessAlgorithm --> LineStorage
+BaseProcessAlgorithm --> CircularShifter
+BaseProcessAlgorithm --> Alphabetizer
+BaseProcessAlgorithm <|-- IncrementalProcess
+BaseProcessAlgorithm <|-- BatchProcess
+
+class Sentence {
+    ....
+    + getSentence() : String
+    + getUrl() : String
+    + setSentence(sentence : String) : void
+    + setUrl(url : String) : void
+    ....
+    - sentence : String
+    - url : String
+}
 
 class LineStorage {
   ....
   + setup() : void
-  + getSentences() : List<String>
-  + setSentences() : void
+  + execute(sentences : List<Sentence>) : void
+  + getSentences() : List<Sentence>
+  + getInstance() : LineStorage
   ____
-  - sentences : List<String> 
+  - sentences : List<Sentence> 
 }
 
-class CircularShift {
+class CircularShifter {
   ....
   + setup() : void
-  + getSentences() : List<String>
-  + setSentences() : void
+  + execute(sentence : Sentence) : void
+  + getSentences() : List<Sentence>
+  + getInstance() : CircularShift
   ____
-  - sentences : List<String> 
+  - sentences : List<Sentence> 
 }
 
-class AlphabeticShift {
+class Alphabetizer {
   ....
   + setup() : void
-  + getSentences() : List<String>
-  + setSentences() : void
+  + execute(sentences : List<Sentence>) : void
+  + getSentences() : List<Sentence>
+  + getInstance() : Alphabetizer
   ____
-  - sentences : List<String> 
+  - sentences : List<Sentence> 
 }
 
-class MasterControl {
+interface BaseProcessAlgorithm {
+  ....
+  process(newSentences : List<Sentence>, callback Callback) : void
+  ____
+}
+
+class IncrementalProcess {
+  ....
+  ____
+}
+
+class BatchProcess {
   ....
   ____
 }
@@ -84,22 +116,35 @@ class MasterControl {
 @startuml
 participant Tester
 
-User -> LineStorage: setSentences
+Tester -> View: input
+activate View
+
+View -> Presenter: process
+activate Presenter
+
+Presenter -> Algorithm: process
+activate Algorithm
+
+Algorithm -> LineStorage: execute
 activate LineStorage
+deactivate Algorithm
 
-LineStorage -> CircularShift: setSentences
+LineStorage -> CircularShift: execute
 activate CircularShift
+deactivate LineStorage
 
-CircularShift -> AlphabeticShift: setSentences
+CircularShift -> AlphabeticShift: execute
 activate AlphabeticShift
-AlphabeticShift --> CircularShift: WorkDone
-deactivate AlphabeticShift
-
-CircularShift --> LineStorage: WorkDone
 deactivate CircularShift
 
-LineStorage -> User: Done
-deactivate LineStorage
+AlphabeticShift --> Presenter: callback
+deactivate AlphabeticShift
+
+Presenter --> View: callback
+deactivate Presenter
+
+View --> Tester: Done
+deactivate View
 
 @enduml
 ```
